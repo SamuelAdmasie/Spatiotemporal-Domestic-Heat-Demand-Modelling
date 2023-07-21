@@ -20,8 +20,8 @@ dependencies:
   - ipykernel
   - requests
   - openpyxl
+  - meteostat
   - pip
 
   - pip:
     - osgb
-    - meteostat

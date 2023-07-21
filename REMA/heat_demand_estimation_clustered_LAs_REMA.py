@@ -234,6 +234,10 @@ def hourly_heat_temp_RHPP(heat_node,ndgs):
                 else:
                     daily_heat_demand_total = m_rhpp_2 * temp + b_rhpp_2
                     daily_heat_demand_total=ndgs[heat_node.index(heat_node_name)]*daily_heat_demand_total
+                    #if temp>20:  will be preferable
+                        #temp=20
+                        #daily_heat_demand_total = m_rhpp_2 * temp + b_rhpp_2
+                        #daily_heat_demand_total=ndgs[heat_node.index(heat_node_name)]*daily_heat_demand_total
                 writer.writerow([stamp,temp, daily_heat_demand_total])
 
         df_buses_total=pd.read_csv('data/domestic_RHPP/daily heat demand total_' + heat_node_name + '.csv', index_col=0)
