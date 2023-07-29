@@ -16,12 +16,38 @@ b_total_2=26.84
 
 # Read the tempreature data for all nodes in the PyPSA-GB
 outdoor_temp=pd.read_csv('data/gbNodes_temp.csv')
+timestamps=outdoor_temp.time.values.tolist()
 
-def hourly_heat_temp_EDRP(heat_node,ndgs):
+# let us assume the same outdoor tempreature for the FES as well, only change the time stamps
+def update_year_in_Timestamp(timestamps, fes_year):
+    updated_timestamps = []
+    for timestamp in timestamps:
+        # Split the timestamp into date and time parts
+        date_part, time_part = timestamp.split(' ')
+        # Split the date part into day, month, and year
+        day, month, year = date_part.split('/')
+        # Update the year with the new_year value
+        year = fes_year
+        # Reassemble the date part and time part to form the updated timestamp
+        updated_timestamp = f'{day}/{month}/{year} {time_part}'
+        updated_timestamps.append(updated_timestamp)
+        Timestamp=updated_timestamps
+    return Timestamp
+
+
+
+
+def hourly_heat_temp_EDRP(heat_node,ndgs,fes_year):
     for heat_node_name in heat_node:
-        filename='data/domestic_EDRP/hourly heat demand total_' + heat_node_name + '.csv'
-        temp_list=outdoor_temp[heat_node_name+'_tempreature'].values.tolist()
-        Timestamp=outdoor_temp.time.values.tolist()
+        if fes_year=='2035':
+            filename='data/domestic_EDRP/2035/hourly heat demand total_' + heat_node_name + '.csv'
+            temp_list=outdoor_temp[heat_node_name+'_tempreature'].values.tolist()
+        elif fes_year=='2050':
+            filename='data/domestic_EDRP/2050/hourly heat demand total_' + heat_node_name + '.csv'
+            temp_list=outdoor_temp[heat_node_name+'_tempreature'].values.tolist()
+        
+        #Timestamp=outdoor_temp.time.values.tolist()
+        Timestamp=update_year_in_Timestamp(timestamps, fes_year)
         with open(filename, 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(['Timestamp', 'Ambient Temp', 'Heat Demand'])
@@ -36,8 +62,13 @@ def hourly_heat_temp_EDRP(heat_node,ndgs):
                     hourly_heat_demand_total=ndgs[heat_node.index(heat_node_name)]*hourly_heat_demand_total
                     writer.writerow([stamp,temp, hourly_heat_demand_total])
     
-        df_buses_total=pd.read_csv('data/domestic_EDRP/hourly heat demand total_' + heat_node_name + '.csv', index_col=0) 
-        filename_peak='data/domestic_EDRP/daily_demand/daily heat demand total_'+ heat_node_name + '.csv'  
+        if fes_year=='2035':
+            df_buses_total=pd.read_csv('data/domestic_EDRP/2035/hourly heat demand total_' + heat_node_name + '.csv', index_col=0)
+            filename_peak='data/domestic_EDRP/daily_demand/2035/daily heat demand total_'+ heat_node_name + '.csv'
+         
+        elif fes_year=='2050':
+            df_buses_total=pd.read_csv('data/domestic_EDRP/2050/hourly heat demand total_' + heat_node_name + '.csv', index_col=0)
+            filename_peak='data/domestic_EDRP/2050/daily_demand/daily heat demand total_'+ heat_node_name + '.csv'  
         with open(filename_peak,'w',newline='') as csvfile:
             writer =csv.writer(csvfile)
             writer.writerow(['Timestamp','Heat Demand'])
@@ -51,8 +82,14 @@ def hourly_heat_temp_EDRP(heat_node,ndgs):
                     #next we have to modify the daily heat demand with the normalised profiles
         Normalised_profile=pd.read_csv('data/domestic_EDRP/scaled with normalised profiles/Normalised Total profile_EDRP.csv')
         hourly_nd = Normalised_profile.groupby(Normalised_profile.index // 2).mean(numeric_only=True)            
-        filename_withnorm='data/domestic_EDRP/scaled with normalised profiles/hourly heat demand total_' + heat_node_name + '.csv'
-        daily_total=pd.read_csv('data/domestic_EDRP/daily_demand/daily heat demand total_'+ heat_node_name + '.csv')
+        if fes_year=='2035':
+            filename_withnorm='data/domestic_EDRP/2035/scaled with normalised profiles/hourly heat demand total_' + heat_node_name + '.csv'
+            daily_total=pd.read_csv('data/domestic_EDRP/2035/daily_demand/daily heat demand total_'+ heat_node_name + '.csv')
+        elif fes_year=='2050':
+            filename_withnorm='data/domestic_EDRP/2050/scaled with normalised profiles/hourly heat demand total_' + heat_node_name + '.csv'
+            daily_total=pd.read_csv('data/domestic_EDRP/2050/daily_demand/daily heat demand total_'+ heat_node_name + '.csv')
+            
+        
         with open(filename_withnorm,'w',newline='') as csvfile:
             writer=csv.writer(csvfile)
             writer.writerow(['Timestamp','Heat Demand With Gas Boilers'])
@@ -113,11 +150,20 @@ def hourly_heat_temp_EDRP(heat_node,ndgs):
             
             # heat demand profile generation with DHN
                     
-def hourly_heat_temp_EDRP_DHN(heat_node,ndgs):
+def hourly_heat_temp_EDRP_DHN(heat_node,ndgs,fes_year):
     for heat_node_name in heat_node:
-        filename='data/domestic_EDRP_DHN/hourly heat demand total_' + heat_node_name + '.csv'
-        temp_list=outdoor_temp[heat_node_name+'_tempreature'].values.tolist()
-        Timestamp=outdoor_temp.time.values.tolist()
+        if fes_year=='2035':
+            filename='data/domestic_EDRP_DHN/2035/hourly heat demand total_' + heat_node_name + '.csv'
+        elif fes_year=='2050':
+            filename='data/domestic_EDRP_DHN/2050/hourly heat demand total_'+ heat_node_name+ '.csv'
+            
+            
+        
+        
+        
+        
+        temp_list=outdoor_temp[heat_node_name+'_tempreature'].value.tolist()
+        Timestamp=update_year_in_Timestamp(timestamps, fes_year)
         with open(filename, 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(['Timestamp', 'Ambient Temp', 'Heat Demand'])
@@ -132,8 +178,12 @@ def hourly_heat_temp_EDRP_DHN(heat_node,ndgs):
                     hourly_heat_demand_total=ndgs[heat_node.index(heat_node_name)]*hourly_heat_demand_total
                     writer.writerow([stamp,temp, hourly_heat_demand_total])
     
-        df_buses_total=pd.read_csv('data/domestic_EDRP_DHN/hourly heat demand total_' + heat_node_name + '.csv', index_col=0) 
-        filename_peak='data/domestic_EDRP_DHN/daily_demand/daily heat demand total_'+ heat_node_name + '.csv'  
+        if fes_year=='2035':
+            df_buses_total=pd.read_csv('data/domestic_EDRP_DHN/2035/hourly heat demand total_' +heat_node_name + '.csv',index_col=0)
+            filename_peak='data/domestic_EDRP_DHN//2035/daily_demand/daily heat demand total_' +heat_node_name + '.csv'
+        elif fes_year==2050:
+            df_buses_total=pd.read_csv('data/domestic_EDRP_DHN/2050/hourly heat demand total_' +heat_node_name + 'csv',index_col=0)
+            filename_peak='data/domestic_EDRP_DHN//2050/daily_demand/daily heat demad total_' +heat_node_name + '.csv'
         with open(filename_peak,'w',newline='') as csvfile:
             writer =csv.writer(csvfile)
             writer.writerow(['Timestamp','Heat Demand'])
@@ -145,9 +195,17 @@ def hourly_heat_temp_EDRP_DHN(heat_node,ndgs):
                     
                     #next we have to modify the daily heat demand with the normalised profiles
         Normalised_profile=pd.read_csv('data/domestic_EDRP_DHN/scaled with normalised profiles/Normalised Total profile_EDRP.csv')
-        hourly_nd = Normalised_profile.groupby(Normalised_profile.index // 2).mean(numeric_only=True)            
-        filename_withnorm='data/domestic_EDRP_DHN/scaled with normalised profiles/hourly heat demand total_' + heat_node_name + '.csv'
-        daily_total=pd.read_csv('data/domestic_EDRP_DHN/daily_demand/daily heat demand total_'+ heat_node_name + '.csv')
+        hourly_nd = Normalised_profile.groupby(Normalised_profile.index // 2).mean(numeric_only=True) 
+        
+        
+        if fes_year=='2035':
+            filename_withnorm='data/domestic_EDRP_DHN/2035/scaled with normalised profiles/hourly heat demand total_' + heat_node_name + '.csv'
+            daily_total=pd.read_csv('data/domestic_EDRP_DHN/daily_demand/daily heat demand total_' + heat_node_name + '.csv')
+        elif fes_year=='2050':
+            filename_withnorm='data/domestic_EDRP_DHN/2050/scaled with normalised profiles/hourly heat demand total_' + heat_node_name + '.csv'
+            daily_total=pd.read_csv('data/domestic_EDRP_DHN/2050/daily_demand/daily heat demand total_'+ heat_node_name + '.csv')
+ 
+       
         with open(filename_withnorm,'w',newline='') as csvfile:
             writer=csv.writer(csvfile)
             writer.writerow(['Timestamp','Heat Demand With Gas Boilers'])
@@ -226,7 +284,7 @@ def hourly_heat_temp_RHPP(heat_node,ndgs,fes_year):
             filename='data/domestic_RHPP/2050/daily heat demand total_' + heat_node_name + '.csv'
             temp_list=outdoor_temp[heat_node_name+'_tempreature'].values.tolist()
        
-        Timestamp=outdoor_temp.time.values.tolist()
+        Timestamp=update_year_in_Timestamp(timestamps, fes_year)
         with open(filename, 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(['Timestamp','Ambient Temp', 'HP total Demand'])
@@ -333,7 +391,7 @@ def hourly_heat_temp_RHPP_ASHP(heat_node,ndgs):
         filename='data/domestic_RHPP/ASHP/daily heat demand total_' + heat_node_name + '.csv'
         temp_list=outdoor_temp[heat_node_name+'_tempreature'].values.tolist()
         
-        Timestamp=outdoor_temp.time.values.tolist()
+        Timestamp=update_year_in_Timestamp(Timestamp, fes_year)
         with open(filename, 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(['Timestamp','Ambient Temp', 'HP total Demand'])
