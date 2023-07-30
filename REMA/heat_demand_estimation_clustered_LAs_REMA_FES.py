@@ -58,13 +58,19 @@ def hourly_heat_temp_EDRP(heat_node,ndgs,fes_year):
                     writer.writerow([stamp,temp, hourly_heat_demand_total])
                  
                 else:
-                    hourly_heat_demand_total = m_total_2 * temp + b_total_2
-                    hourly_heat_demand_total=ndgs[heat_node.index(heat_node_name)]*hourly_heat_demand_total
-                    writer.writerow([stamp,temp, hourly_heat_demand_total])
+                    if temp>26.5:
+                        temp=26.5
+                        hourly_heat_demand_total = m_total_2 * temp + b_total_2
+                        hourly_heat_demand_total=ndgs[heat_node.index(heat_node_name)]*hourly_heat_demand_total
+                        writer.writerow([stamp,temp, hourly_heat_demand_total])
+                    else:    
+                        hourly_heat_demand_total = m_total_2 * temp + b_total_2
+                        hourly_heat_demand_total=ndgs[heat_node.index(heat_node_name)]*hourly_heat_demand_total
+                        writer.writerow([stamp,temp, hourly_heat_demand_total])
     
         if fes_year=='2035':
             df_buses_total=pd.read_csv('data/domestic_EDRP/2035/hourly heat demand total_' + heat_node_name + '.csv', index_col=0)
-            filename_peak='data/domestic_EDRP/daily_demand/2035/daily heat demand total_'+ heat_node_name + '.csv'
+            filename_peak='data/domestic_EDRP/2035/daily_demand/daily heat demand total_'+ heat_node_name + '.csv'
          
         elif fes_year=='2050':
             df_buses_total=pd.read_csv('data/domestic_EDRP/2050/hourly heat demand total_' + heat_node_name + '.csv', index_col=0)
@@ -154,15 +160,14 @@ def hourly_heat_temp_EDRP_DHN(heat_node,ndgs,fes_year):
     for heat_node_name in heat_node:
         if fes_year=='2035':
             filename='data/domestic_EDRP_DHN/2035/hourly heat demand total_' + heat_node_name + '.csv'
+            temp_list=outdoor_temp[heat_node_name+'_tempreature'].values.tolist()
         elif fes_year=='2050':
-            filename='data/domestic_EDRP_DHN/2050/hourly heat demand total_'+ heat_node_name+ '.csv'
+            filename='data/domestic_EDRP_DHN/2050/hourly heat demand total_' + heat_node_name + '.csv'
+            temp_list=outdoor_temp[heat_node_name+'_tempreature'].values.tolist()
             
             
         
-        
-        
-        
-        temp_list=outdoor_temp[heat_node_name+'_tempreature'].value.tolist()
+
         Timestamp=update_year_in_Timestamp(timestamps, fes_year)
         with open(filename, 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
@@ -180,10 +185,10 @@ def hourly_heat_temp_EDRP_DHN(heat_node,ndgs,fes_year):
     
         if fes_year=='2035':
             df_buses_total=pd.read_csv('data/domestic_EDRP_DHN/2035/hourly heat demand total_' +heat_node_name + '.csv',index_col=0)
-            filename_peak='data/domestic_EDRP_DHN//2035/daily_demand/daily heat demand total_' +heat_node_name + '.csv'
-        elif fes_year==2050:
-            df_buses_total=pd.read_csv('data/domestic_EDRP_DHN/2050/hourly heat demand total_' +heat_node_name + 'csv',index_col=0)
-            filename_peak='data/domestic_EDRP_DHN//2050/daily_demand/daily heat demad total_' +heat_node_name + '.csv'
+            filename_peak='data/domestic_EDRP_DHN/2035/daily_demand/daily heat demand total_' +heat_node_name + '.csv'
+        elif fes_year=='2050':
+            df_buses_total=pd.read_csv('data/domestic_EDRP_DHN/2050/hourly heat demand total_' +heat_node_name + '.csv',index_col=0)
+            filename_peak='data/domestic_EDRP_DHN/2050/daily_demand/daily heat demand total_' +heat_node_name + '.csv'
         with open(filename_peak,'w',newline='') as csvfile:
             writer =csv.writer(csvfile)
             writer.writerow(['Timestamp','Heat Demand'])
