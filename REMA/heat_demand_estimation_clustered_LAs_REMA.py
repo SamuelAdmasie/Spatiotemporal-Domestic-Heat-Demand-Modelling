@@ -217,9 +217,14 @@ b_rhpp_2=30
 
 # Let us consider the same heating patter will be follwed irrespective of tempreature
 
-def hourly_heat_temp_RHPP(heat_node,ndgs):
+def hourly_heat_temp_RHPP(heat_node,ndgs,modell):
+    if modell=='zonal':
+        outdoor_temp=pd.read_csv('data/gbZones_temp.csv')
     for heat_node_name in heat_node:
-        filename='data/domestic_RHPP/daily heat demand total_' + heat_node_name + '.csv'
+        if modell=='zonal':
+            filename='data/domestic_RHPP/ZonalModel/daily heat demand total_' + heat_node_name + '.csv'
+        else:
+            filename='data/domestic_RHPP/daily heat demand total_' + heat_node_name + '.csv'
         temp_list=outdoor_temp[heat_node_name+'_tempreature'].values.tolist()
         
         Timestamp=outdoor_temp.time.values.tolist()
@@ -240,8 +245,12 @@ def hourly_heat_temp_RHPP(heat_node,ndgs):
                         #daily_heat_demand_total=ndgs[heat_node.index(heat_node_name)]*daily_heat_demand_total
                 writer.writerow([stamp,temp, daily_heat_demand_total])
 
-        df_buses_total=pd.read_csv('data/domestic_RHPP/daily heat demand total_' + heat_node_name + '.csv', index_col=0)
-        filename_peak='data/domestic_RHPP/daily_demand/daily heat demand total_'+ heat_node_name + '.csv'
+        if modell=='zonal':
+            df_buses_total=pd.read_csv('data/domestic_RHPP/ZonalModel/daily heat demand total_' + heat_node_name + '.csv', index_col=0)
+            filename_peak='data/domestic_RHPP/ZonalModel/daily_demand/daily heat demand total_'+ heat_node_name + '.csv'
+        else:
+            df_buses_total=pd.read_csv('data/domestic_RHPP/daily heat demand total_' + heat_node_name + '.csv', index_col=0)
+            filename_peak='data/domestic_RHPP/daily_demand/daily heat demand total_'+ heat_node_name + '.csv'
         with open(filename_peak,'w',newline='') as csvfile:
             writer =csv.writer(csvfile)
             writer.writerow(['Timestamp','HP total Demand'])
@@ -249,10 +258,16 @@ def hourly_heat_temp_RHPP(heat_node,ndgs):
                 daily_total=sum(df_buses_total['HP total Demand'][i:i+24])
                 for timestamp_hourly,half in zip(Timestamp[i:i+24],range(i,i+24)):
                     writer.writerow([timestamp_hourly,daily_total])
-        Normalised_profile=pd.read_csv('data/domestic_RHPP/scaled with normalised profiles/Normalised Total profile_RHPP.csv')
-        hourly_nd = Normalised_profile.groupby(Normalised_profile.index // 2).mean(numeric_only=True)
-        filename_withnorm='data/domestic_RHPP/scaled with normalised profiles/hourly heat demand total_' + heat_node_name + '.csv'
-        daily_total=pd.read_csv('data/domestic_RHPP/daily_demand/daily heat demand total_'+ heat_node_name + '.csv')
+        if modell=='zonal':
+            Normalised_profile=pd.read_csv('data/domestic_RHPP/ZonalModel/scaled with normalised profiles/Normalised Total profile_RHPP.csv')
+            hourly_nd = Normalised_profile.groupby(Normalised_profile.index // 2).mean(numeric_only=True)
+            filename_withnorm='data/domestic_RHPP/ZonalModel/scaled with normalised profiles/hourly heat demand total_' + heat_node_name + '.csv'
+            daily_total=pd.read_csv('data/domestic_RHPP/ZonalModel/daily_demand/daily heat demand total_'+ heat_node_name + '.csv')
+        else:
+            Normalised_profile=pd.read_csv('data/domestic_RHPP/scaled with normalised profiles/Normalised Total profile_RHPP.csv')
+            hourly_nd = Normalised_profile.groupby(Normalised_profile.index // 2).mean(numeric_only=True)
+            filename_withnorm='data/domestic_RHPP/scaled with normalised profiles/hourly heat demand total_' + heat_node_name + '.csv'
+            daily_total=pd.read_csv('data/domestic_RHPP/daily_demand/daily heat demand total_'+ heat_node_name + '.csv')
         with open(filename_withnorm,'w',newline='') as csvfile:
             writer=csv.writer(csvfile)
             writer.writerow(['Timestamp','Heat Demand With HPs'])

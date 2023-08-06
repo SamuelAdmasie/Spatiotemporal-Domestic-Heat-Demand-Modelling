@@ -14,14 +14,16 @@ dependencies:
   - numpy
   - matplotlib=3.7.0
   - seaborn
-  - cartopy=0.19.0.post1
-  - shapely=1.7.1
+  - cartopy=0.21
+  - shapely=2.0.1
   - imageio
   - ipykernel
   - requests
   - openpyxl
-  - meteostat
   - pip
+  - geopandas
+  - geopy
 
   - pip:
     - osgb
+    - meteostat

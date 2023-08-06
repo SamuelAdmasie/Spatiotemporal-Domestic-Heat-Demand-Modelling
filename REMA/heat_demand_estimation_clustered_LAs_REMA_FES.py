@@ -1,5 +1,6 @@
 import csv
 import pandas as pd
+from datetime import datetime
 
 # estimating the daily heat demand and the cofficeint of performance for heat pumps from the daily tempreature profile using the regression equations derived by Watson. et al.
 
@@ -15,7 +16,13 @@ b_total_2=26.84
 
 
 # Read the tempreature data for all nodes in the PyPSA-GB
-outdoor_temp=pd.read_csv('data/gbNodes_temp.csv')
+modell='zonal'
+##model='reduced'
+if modell=='zonal':
+    outdoor_temp=pd.read_csv('data/gbZones_temp.csv')
+    outdoor_temp['time'] = pd.to_datetime(outdoor_temp['time']).dt.strftime('%d/%m/%Y %H:%M:%S')
+else:
+    outdoor_temp=pd.read_csv('data/gbNodes_temp.csv')
 timestamps=outdoor_temp.time.values.tolist()
 
 # let us assume the same outdoor tempreature for the FES as well, only change the time stamps
@@ -280,12 +287,16 @@ b_rhpp_2=30
 
 # Let us consider the same heating patter will be follwed irrespective of tempreature
 
-def hourly_heat_temp_RHPP(heat_node,ndgs,fes_year):
+def hourly_heat_temp_RHPP(heat_node,ndgs,fes_year,m):
     for heat_node_name in heat_node:
         if fes_year=='2035':
-            filename='data/domestic_RHPP/2035/daily heat demand total_' + heat_node_name + '.csv'
-            temp_list=outdoor_temp[heat_node_name+'_tempreature'].values.tolist()
-        elif fes_year=='2050':
+            if modell=='zonal':
+                filename='data/domestic_RHPP/2035/ZonalModel/daily heat demand total_' + heat_node_name + '.csv'
+                temp_list=outdoor_temp[heat_node_name+'_tempreature'].values.tolist()
+            else: # reduced model
+                filename='data/domestic_RHPP/2035/daily heat demand total_' + heat_node_name + '.csv'
+                temp_list=outdoor_temp[heat_node_name+'_tempreature'].values.tolist()
+        elif fes_year=='2050': # this is not implemented for the zonal model at the moment
             filename='data/domestic_RHPP/2050/daily heat demand total_' + heat_node_name + '.csv'
             temp_list=outdoor_temp[heat_node_name+'_tempreature'].values.tolist()
        
@@ -308,8 +319,12 @@ def hourly_heat_temp_RHPP(heat_node,ndgs,fes_year):
                 writer.writerow([stamp,temp, daily_heat_demand_total])
 
         if fes_year=='2035':
-            df_buses_total=pd.read_csv('data/domestic_RHPP/2035/daily heat demand total_' + heat_node_name + '.csv', index_col=0)
-            filename_peak='data/domestic_RHPP/2035/daily_demand/daily heat demand total_'+ heat_node_name + '.csv'
+            if modell=='zonal':
+                df_buses_total=pd.read_csv('data/domestic_RHPP/2035/ZonalModel/daily heat demand total_' + heat_node_name + '.csv', index_col=0)
+                filename_peak='data/domestic_RHPP/2035/ZonalModel/daily_demand/daily heat demand total_'+ heat_node_name + '.csv'
+            else:
+                df_buses_total=pd.read_csv('data/domestic_RHPP/2035/daily heat demand total_' + heat_node_name + '.csv', index_col=0)
+                filename_peak='data/domestic_RHPP/2035/daily_demand/daily heat demand total_'+ heat_node_name + '.csv'
         elif fes_year=='2050':
             df_buses_total=pd.read_csv('data/domestic_RHPP/2050/daily heat demand total_' + heat_node_name + '.csv', index_col=0)
             filename_peak='data/domestic_RHPP/2050/daily_demand/daily heat demand total_'+ heat_node_name + '.csv'
@@ -324,8 +339,12 @@ def hourly_heat_temp_RHPP(heat_node,ndgs,fes_year):
         Normalised_profile=pd.read_csv('data/domestic_RHPP/scaled with normalised profiles/Normalised Total profile_RHPP.csv')
         hourly_nd = Normalised_profile.groupby(Normalised_profile.index // 2).mean(numeric_only=True)
         if fes_year=='2035':
-            filename_withnorm='data/domestic_RHPP/2035/scaled with normalised profiles/hourly heat demand total_' + heat_node_name + '.csv'
-            daily_total=pd.read_csv('data/domestic_RHPP/2035/daily_demand/daily heat demand total_'+ heat_node_name + '.csv')
+            if modell=='zonal':
+                filename_withnorm='data/domestic_RHPP/2035/ZonalModel/scaled with normalised profiles/hourly heat demand total_' + heat_node_name + '.csv'
+                daily_total=pd.read_csv('data/domestic_RHPP/2035/ZonalModel/daily_demand/daily heat demand total_'+ heat_node_name + '.csv')
+            else: # reduced model
+                filename_withnorm='data/domestic_RHPP/2035/scaled with normalised profiles/hourly heat demand total_' + heat_node_name + '.csv'
+                daily_total=pd.read_csv('data/domestic_RHPP/2035/daily_demand/daily heat demand total_'+ heat_node_name + '.csv')
         elif fes_year=='2050':
             filename_withnorm='data/domestic_RHPP/2050/scaled with normalised profiles/hourly heat demand total_' + heat_node_name + '.csv'
             daily_total=pd.read_csv('data/domestic_RHPP/2050/daily_demand/daily heat demand total_'+ heat_node_name + '.csv')
