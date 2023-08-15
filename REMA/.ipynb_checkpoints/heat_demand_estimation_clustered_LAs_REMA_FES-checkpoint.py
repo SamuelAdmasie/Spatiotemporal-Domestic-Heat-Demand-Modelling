@@ -65,8 +65,8 @@ def hourly_heat_temp_EDRP(heat_node,ndgs,fes_year):
                     writer.writerow([stamp,temp, hourly_heat_demand_total])
                  
                 else:
-                    if temp>26.5:
-                        temp=26.5
+                    if temp>26.5:       #   setting this value much lower could give better estimation, example after temp>18 set the temp 18
+                        temp=26.5        #
                         hourly_heat_demand_total = m_total_2 * temp + b_total_2
                         hourly_heat_demand_total=ndgs[heat_node.index(heat_node_name)]*hourly_heat_demand_total
                         writer.writerow([stamp,temp, hourly_heat_demand_total])

@@ -15,7 +15,10 @@ b_total_2=26.84
 
 
 # Read the tempreature data for all nodes in the PyPSA-GB
+#modell='reduced
+
 outdoor_temp=pd.read_csv('data/gbNodes_temp.csv')
+
 
 def hourly_heat_temp_EDRP(heat_node,ndgs):
     for heat_node_name in heat_node:
@@ -535,9 +538,15 @@ breakpoint_temp=7.7
 m_2=-0.075
 b_2=3.09   
 
-def hourly_cop_temp(heat_node):
+def hourly_cop_temp(heat_node,modell):
     for heat_node_name in heat_node:
-        filename='data/domestic_RHPP/COP/hourly COP_' + heat_node_name + '.csv'
+        if modell=='reduced':
+            filename='data/domestic_RHPP/COP/ReducedModel/hourly COP_' + heat_node_name + '.csv'
+            #temp_list=outdoor_temp[heat_node_name+'_tempreature'].values.tolist()
+            
+        elif modell=='zonal':
+            filename='data/domestic_RHPP/COP/ZonalModel/hourly COP_' + heat_node_name + '.csv'
+            outdoor_temp=pd.read_csv('data/gbZones_temp.csv')
         temp_list=outdoor_temp[heat_node_name+'_tempreature'].values.tolist()
         
         Timestamp=outdoor_temp.time.values.tolist()
