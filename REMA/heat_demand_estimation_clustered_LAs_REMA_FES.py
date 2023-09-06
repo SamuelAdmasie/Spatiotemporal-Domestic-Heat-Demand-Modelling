@@ -2,9 +2,9 @@ import csv
 import pandas as pd
 from datetime import datetime
 
-# estimating the daily heat demand and the cofficeint of performance for heat pumps from the daily tempreature profile using the regression equations derived by Watson. et al.
+# Estimating the daily heat demand and the coefficient of performance for heat pumps from the daily temperature profile using the regression equations derived by Watson. et al. The regression equations are derived from trained data with a limited temperature range, however, these equations are applied for all temperature ranges above and below the breakpoint temperature, therefore, the heat demand estimation might lead to a very high estimate as opposed to the actual heat demand.
 
-# Let us do the implemenattion from the EDRP dataset
+# Let us do the implementation from the EDRP dataset
 
 m_total_1=-5.463
 b_total_1=90.55
@@ -15,7 +15,7 @@ m_total_2=-0.988
 b_total_2=26.84
 
 
-# Read the tempreature data for all nodes in the PyPSA-GB
+# Read the temperature data for all nodes in the PyPSA-GB
 modell='zonal'
 ##model='reduced'
 if modell=='zonal':
@@ -158,10 +158,10 @@ def hourly_heat_temp_EDRP(heat_node,ndgs,fes_year):
                     heat_demand=npf*daily_total['Heat Demand'][idx]
                     writer.writerow([hour,heat_demand])
                 #elif:
-                   # there is a missing data for in the peterhead tempreature around at 4k,check that again or fill the missing value
+                   # There is missing data in the Peterhead temperature around 4k, check that again or fill in the missing value
               
             
-            # heat demand profile generation with DHN
+            # Heat demand profile generation with DHN
                     
 def hourly_heat_temp_EDRP_DHN(heat_node,ndgs,fes_year):
     for heat_node_name in heat_node:
@@ -285,7 +285,7 @@ m_rhpp_2=-1.11
 b_rhpp_2=30
 
 
-# Let us consider the same heating patter will be follwed irrespective of tempreature
+# Let us consider the same heating patter will be followed irrespective of temperature
 
 def hourly_heat_temp_RHPP(heat_node,ndgs,fes_year,m):
     for heat_node_name in heat_node:
@@ -668,7 +668,7 @@ def hourly_cop_temp_ASHP(heat_node):
                     
                 elif temp>breakpoint_temp_rhpp and temp<20:
                     hourly_cop = m_2 * temp + b_2
-                elif temp>20:     #  the data driven model cosiders upto this tempreature range
+                elif temp>20:     #  The data-driven model considers up to this temperature range
                     hourly_cop=1.4
                 writer.writerow([stamp,temp, hourly_cop])
                 

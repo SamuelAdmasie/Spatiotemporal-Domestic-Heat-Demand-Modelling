@@ -1,9 +1,9 @@
 import csv
 import pandas as pd
 
-# estimating the daily heat demand and the cofficeint of performance for heat pumps from the daily tempreature profile using the regression equations derived by Watson. et al.
+# Estimating the daily heat demand and the coefficient of performance for heat pumps from the daily temperature profile using the regression equations derived by Watson. et al. The regression equations are derived from trained data with a limited temperature range, however, these equations are applied for all temperature ranges above and below the breakpoint temperature, and therefore, the heat demand estimation may lead to a very high estimate as opposed to the actual heat demand.  
 
-# Let us do the implemenattion from the EDRP dataset
+# Let us do the implementation from the EDRP dataset
 
 m_total_1=-5.463
 b_total_1=90.55
@@ -14,8 +14,11 @@ m_total_2=-0.988
 b_total_2=26.84
 
 
-# Read the tempreature data for all nodes in the PyPSA-GB
-#modell='reduced
+# Read the temperature data for all nodes in the PyPSA-GB
+
+
+
+#modell='reduced     
 
 outdoor_temp=pd.read_csv('data/gbNodes_temp.csv')
 
@@ -111,10 +114,10 @@ def hourly_heat_temp_EDRP(heat_node,ndgs):
                     heat_demand=npf*daily_total['Heat Demand'][idx]
                     writer.writerow([hour,heat_demand])
                 #elif:
-                   # there is a missing data for in the peterhead tempreature around at 4k,check that again or fill the missing value
+                   # There is missing data in the Peterhead temperature around 4k, check that again or fill in the missing value
               
             
-            # heat demand profile generation with DHN
+            # Heat demand profile generation with DHN
                     
 def hourly_heat_temp_EDRP_DHN(heat_node,ndgs):
     for heat_node_name in heat_node:
@@ -218,8 +221,8 @@ m_rhpp_2=-1.11
 b_rhpp_2=30
 
 
-# Let us consider the same heating patter will be follwed irrespective of tempreature
-
+# Let us consider the same heating pattern will be followed irrespective of temperature, check the reference paper
+# https://www.sciencedirect.com/science/article/pii/S037877882100061X
 def hourly_heat_temp_RHPP(heat_node,ndgs,modell):
     if modell=='zonal':
         outdoor_temp=pd.read_csv('data/gbZones_temp.csv')
@@ -528,7 +531,7 @@ def hourly_heat_temp_RHPP_GSHP(heat_node,ndgs):
                     npf=Normalised_profile[idx]
                     heat_demand=npf*daily_total['HP total Demand'][idx]
                     writer.writerow([hour,heat_demand])
-    # the efficiency of heat pump is also tempreature dependant and the hourly cop for the clustered nodes can be estimated below
+    # The efficiency of a heat pump is also temperature dependant and the hourly cop for the clustered nodes can be estimated below
    # Determine the COP for the combination of the heat pump installation is assumed as 75% ASHP and 25% GSHP
 m_1=0.045
 b_1=2.17
@@ -561,14 +564,14 @@ def hourly_cop_temp(heat_node,modell):
                     
                 elif temp>breakpoint_temp_rhpp and temp<20:
                     hourly_cop = m_2 * temp + b_2
-                elif temp>20:         # the data driven model considers upto this tempreature range
+                elif temp>20:         # The data-driven model considers up to this temperature range
                     hourly_cop=1.4
                 writer.writerow([stamp,temp, hourly_cop])
 
  
    
-# write the csv file from here rather than manually creat the COP CSV file
-########  Determine the CoP for the heat pump types separetely
+# write the CSV file from here rather than manually create the COP CSV file
+########  Determine the CoP for the heat pump types separately
 
 ######### ASHP
 m_1=0.060
