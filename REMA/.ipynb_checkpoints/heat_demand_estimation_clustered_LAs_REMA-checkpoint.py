@@ -3,8 +3,9 @@ import pandas as pd
 
 # Estimating the daily heat demand and the coefficient of performance for heat pumps from the daily temperature profile using the regression equations derived by Watson. et al. The regression equations are derived from trained data with a limited temperature range, however, these equations are applied for all temperature ranges above and below the breakpoint temperature, and therefore, the heat demand estimation may lead to a very high estimate as opposed to the actual heat demand.  
 
-# Let us do the implementation from the EDRP dataset
+# Let us do the implementation from the EDRP dataset, THIS IS FOR GAS BOILERS
 
+# See Table 1, https://www.sciencedirect.com/science/article/pii/S037877882100061X
 m_total_1=-5.463
 b_total_1=90.55
 

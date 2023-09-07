@@ -4,8 +4,9 @@ from datetime import datetime
 
 # Estimating the daily heat demand and the coefficient of performance for heat pumps from the daily temperature profile using the regression equations derived by Watson. et al. The regression equations are derived from trained data with a limited temperature range, however, these equations are applied for all temperature ranges above and below the breakpoint temperature, therefore, the heat demand estimation might lead to a very high estimate as opposed to the actual heat demand.
 
-# Let us do the implementation from the EDRP dataset
+# Let us do the implementation from the EDRP dataset, THIS IS FOR GAS BOILERS
 
+# See Table 1, https://www.sciencedirect.com/science/article/pii/S037877882100061X
 m_total_1=-5.463
 b_total_1=90.55
 
@@ -25,7 +26,7 @@ else:
     outdoor_temp=pd.read_csv('data/gbNodes_temp.csv')
 timestamps=outdoor_temp.time.values.tolist()
 
-# let us assume the same outdoor tempreature for the FES as well, only change the time stamps
+# let us assume the same outdoor temperature for the FES as well, only change the time stamps
 def update_year_in_Timestamp(timestamps, fes_year):
     updated_timestamps = []
     for timestamp in timestamps:
@@ -161,7 +162,7 @@ def hourly_heat_temp_EDRP(heat_node,ndgs,fes_year):
                    # There is missing data in the Peterhead temperature around 4k, check that again or fill in the missing value
               
             
-            # Heat demand profile generation with DHN
+            # Heat demand profile generation with DHN, REGRESSION EQUATIONS DERIVED FROM GAS BOILER DATA ARE USED IN THIS CASE
                     
 def hourly_heat_temp_EDRP_DHN(heat_node,ndgs,fes_year):
     for heat_node_name in heat_node:
@@ -274,8 +275,11 @@ def hourly_heat_temp_EDRP_DHN(heat_node,ndgs,fes_year):
                     writer.writerow([hour,heat_demand]) 
 
 
- # Doing the same implementation using the RHPP equations
- # the combination of the heat pump installation is assumed as 75% ASHP and 25% GSHP
+ # Doing the same implementation using the RHPP equations, HPS
+
+# See Table 1,https://www.sciencedirect.com/science/article/pii/S037877882100061X
+
+ # The combination of the heat pump installation is assumed as 75% ASHP and 25% GSHP
 m_rhpp_1=-5.88
 b_rhpp_1=97.2
 
@@ -285,7 +289,7 @@ m_rhpp_2=-1.11
 b_rhpp_2=30
 
 
-# Let us consider the same heating patter will be followed irrespective of temperature
+# Let us consider the same heating pattern will be followed irrespective of temperature,  THIS APPLIES REGRESSION EQUATIONS WITH HEAT PUMPS
 
 def hourly_heat_temp_RHPP(heat_node,ndgs,fes_year,m):
     for heat_node_name in heat_node:
